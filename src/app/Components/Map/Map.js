@@ -38,12 +38,12 @@ const Map = () => {
     });
 
     const reverseGeocode = (lat, lng) => {
-      const url = `https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lng}&key=k8dHGVjEkdQd7ySUbcHN`; 
+      const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`;
       fetch(url)
         .then((response) => response.json())
         .then((data) => {
-          if (data.results && data.results.length > 0) {
-            const address = data.results[0].formatted;
+          if (data && data.display_name) {
+            const address = data.display_name;
             setSelectedLocation(address); 
           } else {
           }

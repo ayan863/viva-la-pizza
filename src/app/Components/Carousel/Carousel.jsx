@@ -39,7 +39,7 @@ const Carousel = () => {
             <h1 className="text-4xl font-bold font-beyond">Pizza & Pasta</h1>
             
             <button  className="px-8 py-4 bg-red-600 text-white font-medium rounded-2xl hover:bg-red-700 transition duration-300 flex items-center justify-center gap-2 shadow-lg">
-        <FaShoppingCart /> <Link href="../../Pages/menu">Today's Menu</Link>
+        <FaShoppingCart /> <Link href="/Pages/menu">Today's Menu</Link>
       </button>
           </div>
         </SwiperSlide>

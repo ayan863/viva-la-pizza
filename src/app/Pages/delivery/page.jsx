@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
-const Map = dynamic(() => import("../../Components/Map/Map"));
+const Map = dynamic(() => import("../../Components/Map/Map"), { ssr: false });
 import * as React from "react";
 import Box from "@mui/joy/Box";
 import toast, { Toaster } from "react-hot-toast";

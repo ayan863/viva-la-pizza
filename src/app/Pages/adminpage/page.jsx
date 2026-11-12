@@ -35,7 +35,7 @@ const Login = () => {
             setLoginSuccess(true);
             actions.resetForm();
   
-            router.push(`/Pages/admin/user`)
+            router.push(`/Pages/adminpage/user`)
           } else {
             setLoginSuccess(false);
           }

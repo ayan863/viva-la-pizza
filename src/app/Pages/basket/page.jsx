@@ -159,7 +159,7 @@ const Basket = () => {
           updateUserStorage([]);
           setSelectedPrize("");
           toast.success("Order successfully placed!");
-          router.push("./../../Pages/delivery"); 
+          router.push("/Pages/delivery"); 
         }, 10000);
       }, 12000);
     } else {
@@ -256,7 +256,7 @@ const Basket = () => {
               <>
                 {" "}
                 <p>There is no items in your basket.</p>
-                <Link href="./menu">
+                <Link href="/Pages/menu">
                   <button className="bg-red-600 hover:bg-red-800 text-white px-4 py-2 rounded-md transition duration-300">
                     Go Menu
                   </button>
