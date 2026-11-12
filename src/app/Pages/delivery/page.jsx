@@ -1,7 +1,8 @@
 "use client";
+import { readStorage } from "@/lib/storage";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
-const Map = dynamic(() => import("../../Components/Map/Map"));
+const Map = dynamic(() => import("../../Components/Map/Map"), { ssr: false });
 import * as React from "react";
 import Box from "@mui/joy/Box";
 import toast, { Toaster } from "react-hot-toast";
@@ -90,8 +91,7 @@ export default function Delivery() {
     });
   };
   const handleAddContent = () => {
-    const userData = localStorage.getItem("user");
-    const updatedData = JSON.parse(userData) || {};
+    const updatedData = readStorage("user") || {};
     const ordersData = updatedData.orders || [];
     console.log("updatedData", updatedData);
     
@@ -155,10 +155,10 @@ export default function Delivery() {
   };
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user"));
+    const user = readStorage("user");
     if (user) {
       setUserData(user);
-      const total = user.basket.reduce(
+      const total = (user.basket || []).reduce(
         (acc, item) => acc + parseFloat(item.price || 0),
         0
       );
@@ -209,8 +209,8 @@ export default function Delivery() {
   if (!userData) {
     return <p>Loading...</p>;
   }
-  const groupedItems = userData.orders
-    .flatMap((orders) => orders.items)
+  const groupedItems = (userData.orders || [])
+    .flatMap((orders) => orders.items || [])
     .reduce((acc, item) => {
       acc[item.type] = acc[item.type] || [];
       acc[item.type].push(item.name);

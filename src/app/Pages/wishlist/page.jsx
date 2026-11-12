@@ -63,7 +63,7 @@ const Page = () => {
       ) : (
         <div className="no-items-message italic">
           <p>There are no items in your wishlist.</p>
-          <Link href="./menu">
+          <Link href="/Pages/menu">
       <button className="bg-red-600 hover:bg-red-800 text-white px-4 py-2 rounded-md transition duration-300">
                 Go Menu
             </button>

@@ -1,4 +1,6 @@
 "use client";
+import { productImage, onImageError } from "@/lib/images";
+import { readStorage } from "@/lib/storage";
 import { setActiveItem } from "@/app/redux/feature/menu/MenuSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { FaUser, FaShoppingCart } from "react-icons/fa";
@@ -18,7 +20,7 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [basketCount, setBasketCount] = React.useState(0);
   const getBasketCount = () => {
-    const user = JSON.parse(localStorage.getItem("user")) || {};
+    const user = readStorage("user") || {};
     const basket = user.basket || [];
     return basket.length;
   };
@@ -82,7 +84,7 @@ const Header = () => {
       updatedItems[index].quantity += 1;
       setBasketItems(updatedItems);
 
-      const user = JSON.parse(localStorage.getItem("user"));
+      const user = readStorage("user");
       if (user && user.basket) {
         user.basket = updatedItems;
         localStorage.setItem("user", JSON.stringify(user));
@@ -106,7 +108,7 @@ const Header = () => {
         updatedItems[index].quantity -= 1;
         setBasketItems(updatedItems);
 
-        const user = JSON.parse(localStorage.getItem("user"));
+        const user = readStorage("user");
         if (user && user.basket) {
           user.basket = updatedItems;
           localStorage.setItem("user", JSON.stringify(user));
@@ -147,7 +149,7 @@ const Header = () => {
         <div
           className={`${
             isMenuOpen ? "absolute" : "hidden"
-          } md:flex md:relative bg-white flex-col md:flex-row bg-[url("https://opencart.templatetrip.com/OPCTM01/OPCTM013_pizza/catalog/view/theme/OPCTM013/stylesheet/TemplateTrip/images/footer-bg.jpg")] md:bg-transparent w-full md:w-auto md:top-0 top-[100%] left-0 z-10`}
+          } md:flex md:relative bg-white flex-col md:flex-row bg-[url("/images/scenes/dark-bg.svg")] md:bg-transparent w-full md:w-auto md:top-0 top-[100%] left-0 z-10`}
         >
           <ul className="flex flex-col md:flex-row items-center md:items-start gap-4 p-4 md:p-0">
             {menuItems.map((item) => (
@@ -155,11 +157,11 @@ const Header = () => {
                 {item.title === "Home" ? (
                   <Link href="/">{item.title}</Link>
                 ) : item.title === "Services" ? (
-                  <Link href="../../Pages/menu">{item.title}</Link>
+                  <Link href="/Pages/menu">{item.title}</Link>
                 ) : item.title === "About Us" ? (
-                  <Link href="../../Pages/aboutUs">{item.title}</Link>
+                  <Link href="/Pages/aboutUs">{item.title}</Link>
                 ): item.title === "Order history" ? (
-                  <Link href="../../Pages/orderHistory">{item.title}</Link>
+                  <Link href="/Pages/orderHistory">{item.title}</Link>
                 )
                 
                 : (
@@ -203,10 +205,10 @@ const Header = () => {
               <div className="userMenu absolute top-full mt-2 z-10 bg-white text-black rounded shadow-lg p-2">
                 <ul>
                   <li className="px-4 py-2 hover:bg-gray-200 text-[15px] rounded">
-                    <Link href="./">Profile</Link>
+                    <Link href="/">Profile</Link>
                   </li>
                   <li className="px-4 py-2 hover:bg-gray-200 text-[15px] rounded">
-                    <Link href="./../../Pages/wishlist">Wishlist</Link>
+                    <Link href="/Pages/wishlist">Wishlist</Link>
                   </li>
 
                   {userData ? (
@@ -224,7 +226,7 @@ const Header = () => {
                       <li className="text-[15px]">
                         <Link
                           className="hover:bg-gray-200 flex px-4 py-2 rounded"
-                          href="../../Pages/login"
+                          href="/Pages/login"
                         >
                           Login
                         </Link>
@@ -232,7 +234,7 @@ const Header = () => {
                       <li className="text-[15px] ">
                         <Link
                           className="hover:bg-gray-200 flex px-4 py-2 rounded"
-                          href="../../Pages/signup"
+                          href="/Pages/signup"
                         >
                           Signup
                         </Link>
@@ -250,7 +252,7 @@ const Header = () => {
               onMouseEnter={handleBasketMouseEnter}
               onMouseLeave={handleBasketMouseLeave}
             >
-              <Link href="./../../Pages/basket">
+              <Link href="/Pages/basket">
                 <Badge
                   badgeContent={basketCount}
                   variant="solid"
@@ -273,7 +275,8 @@ const Header = () => {
                             <div className="flex icons gap-3 relative items-center justify-center">
                               <div className="flex-1 w-[50px]">
                                 <img
-                                  src={item.image}
+                                  src={productImage(item)}
+                                  onError={onImageError(item.type)}
                                   alt={item.name}
                                   className="w-[40px] h-[40px] rounded-full"
                                 />
@@ -299,7 +302,7 @@ const Header = () => {
                       </ul>
                       <div className="mt-4 text-center">
                         <Link
-                          href="./../../Pages/basket"
+                          href="/Pages/basket"
                           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
                         >
                           Go Basket Page

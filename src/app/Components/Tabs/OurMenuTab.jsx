@@ -1,4 +1,5 @@
 "use client";
+import { productImage, onImageError } from "@/lib/images";
 
 import * as React from "react";
 import Box from "@mui/joy/Box";
@@ -73,7 +74,7 @@ const OurMenuTab = () => {
         {filteredItems.length > 0 ? (
           filteredItems.map((item) => (
             <div className="card flex flex-wrap lg:w-[45%] w-[100%] h-auto sm:h-auto items-center justify-center p-2 border-4	rounded-sm	border-s-[#c46d6d]	border-y-transparent border-e-transparent	" key={item.id}>
-                <img src={item.image} alt={item.name} className="w-[90px] h-[90px] m-2 hidden sm:block"/>
+                <img src={productImage(item)} onError={onImageError(item.type)} alt={item.name} className="w-[90px] h-[90px] m-2 hidden sm:block"/>
                 <div className="title w-[50%]">
                     <p className="name !!text-[10px]" >{item.name}</p>
                     <span className="ingredients">{item.ingredients !== "-" ? item.ingredients : null}</span>

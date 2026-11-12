@@ -1,6 +1,8 @@
 "use client";
 
 import "./globals.css";
+import { useEffect, useState } from "react";
+import { cleanStorage } from "@/lib/storage";
 import Head from "next/head";
 import { store } from "./redux/app/store";
 import { Provider } from "react-redux";
@@ -18,6 +20,14 @@ import { Toaster } from "react-hot-toast";
 
 
 export default function RootLayout({ children }) {
+  // localStorage və window yalnız brauzerdə var. Səhifəni yalnız brauzerdə render edirik,
+  // yoxsa `next build` zamanı "localStorage is not defined" xətası çıxır.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    cleanStorage();
+    setMounted(true);
+  }, []);
+
   return (
     <html lang="en">
       {/* <Head>
@@ -39,7 +49,7 @@ export default function RootLayout({ children }) {
           {/* <Header /> */}
           <Toaster position="top-center" />
 
-          {children}
+          {mounted ? children : null}
           {/* <Footer /> */}
         </Provider>
       </body>

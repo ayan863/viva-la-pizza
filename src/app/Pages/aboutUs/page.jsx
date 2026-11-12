@@ -16,7 +16,7 @@ const Haqqimizda = () => {
         <Smallintro
           text={["Welcome to Viva La Pizza"]}
           image={[
-            "https://pizza.az/upload/iblock/a4f/a4f20aa25ee40582db412e8b36db5321.jpg",
+            "/images/scenes/about-1.svg",
           ]}
         />
       </div>
@@ -49,17 +49,17 @@ const Haqqimizda = () => {
         <div className="about-picture">
           <img
           className="object-cover"
-            src="https://pizza.az/upload/iblock/cd2/cd213e6cb1c83918a649ab9343db3a88.jpg"
+            src="/images/scenes/about-2.svg"
             alt="Picture 1"
           />
           <img
           className="object-cover"
-            src="https://pizza.az/upload/iblock/cd2/cd213e6cb1c83918a649ab9343db3a88.jpg"
+            src="/images/scenes/about-2.svg"
             alt="Picture 2"
           />
           <img
           className="object-cover"
-            src="https://pizza.az/upload/iblock/be4/be490d36a7478c90ad4b19baee796ffc.jpg"
+            src="/images/scenes/about-3.svg"
             alt="Picture 3"
           />
         </div>

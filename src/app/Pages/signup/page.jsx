@@ -212,7 +212,7 @@ const Signup = () => {
               </div>
             </div>
             <div className="sign">
-              <Link href="./../../Pages/login"> I'm already a member Log In</Link>
+              <Link href="/Pages/login"> I'm already a member Log In</Link>
             </div>
           </div>
         </div>

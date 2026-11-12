@@ -27,15 +27,13 @@ const Login = () => {
           const matchedUser = data.find(
             (item) => item.name === values.name && item.password === values.password
           );
-          localStorage.clear();
-          localStorage.setItem(`admin`,JSON.stringify(matchedUser));
-          console.log("item=",matchedUser);
-  
           if (matchedUser) {
+            localStorage.clear();
+            localStorage.setItem(`admin`, JSON.stringify(matchedUser));
             setLoginSuccess(true);
             actions.resetForm();
   
-            router.push(`/Pages/admin/user`)
+            router.push(`/Pages/adminpage/user`)
           } else {
             setLoginSuccess(false);
           }

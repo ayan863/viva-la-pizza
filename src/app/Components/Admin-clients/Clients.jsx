@@ -121,7 +121,7 @@ const Clients = () => {
                   src={
                     item.image
                       ? item.image
-                      : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRuEiaDNDqRo6K0Zn_NlRJjAde-B1zommEhIg&s"
+                      : "/images/scenes/avatar.svg"
                   }
                   alt={item.name}
                   className="w-[90px] h-[90px] m-2 rounded-[50%]"

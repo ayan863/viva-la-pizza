@@ -1,4 +1,6 @@
 "use client";
+import { productImage, onImageError } from "@/lib/images";
+import { readStorage } from "@/lib/storage";
 import React, { useEffect, useState } from "react";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { useRouter } from "next/navigation";
@@ -27,9 +29,10 @@ const Basket = () => {
   const [prizeNumber, setPrizeNumber] = useState(0);
   const [isOrderPlaced, setIsOrderPlaced] = useState(false);
   const [discountedTotal, setDiscountedTotal] = useState(0);
+  const [balanceAfter, setBalanceAfter] = useState(null);
 
   useEffect(() => {
-    const userData = JSON.parse(localStorage.getItem("user")) || { basket: [] };
+    const userData = readStorage("user") || { basket: [] };
     setCartItems(userData.basket || []);
   }, []);
 
@@ -38,27 +41,53 @@ const Basket = () => {
     if (prize.includes("%")) return parseFloat(prize.replace("%", ""));
     return 0;
 };
+  // Hesablama köməkçiləri: bütün məbləğlər rəqəm kimi, 2 onluq rəqəmlə
+  const round2 = (n) => Math.round((Number(n) || 0) * 100) / 100;
+  const orderSnapshot = React.useRef(null);
+
+  // Çarx dayananda: endirimi tətbiq et, balansı yenilə, sifarişi saxla
   const handleStopSpinning = () => {
     setMustSpin(false);
-    const selectedPrize = data[prizeNumber].option;
-    setSelectedPrize(selectedPrize);
+    const snapshot = orderSnapshot.current;
+    if (!snapshot) return;
 
-    const numericPrize = getNumericPrize(selectedPrize);
-    const discountedTotal = (
-      totalPrice -
-      totalPrice * (numericPrize * 0.01)
-    ).toFixed(2);
-    setDiscountedTotal(discountedTotal);
+    const prize = data[prizeNumber].option;
+    const percent = getNumericPrize(prize);
+    const finalPrice = round2(snapshot.total * (1 - percent / 100));
+    const user = readStorage("user") || {};
+    const newBalance = round2((parseFloat(user.money) || 0) - finalPrice);
 
-    toast.success(`Order accepted!`);
-    toast.success(
-      `Discounted amount: ${discountedTotal}₼ Your balance: ${(
-        JSON.parse(localStorage.getItem("user")).money - discountedTotal
-      ).toFixed(2)}`
-    );
-    setCartItems([]);
-    updateUserStorage([]);
+    setSelectedPrize(prize);
+    setDiscountedTotal(finalPrice);
+    setBalanceAfter(newBalance);
     setIsOrderPlaced(true);
+
+    const order = {
+      items: snapshot.items,
+      original: round2(snapshot.total).toFixed(2),
+      discount: percent,
+      spent: finalPrice.toFixed(2),
+      date: new Date().toISOString(),
+    };
+    const updatedUser = {
+      ...user,
+      money: newBalance.toFixed(2),
+      basket: [],
+      orders: [order],
+    };
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+    setCartItems([]);
+
+    if (user.id) {
+      axios
+        .put(`https://66eba35c2b6cf2b89c5b2596.mockapi.io/login/${user.id}`, updatedUser)
+        .catch((error) => console.error("Error updating user data:", error));
+    }
+
+    toast.success(
+      `Sale: ${prize} — you pay ${finalPrice.toFixed(2)}₼. Balance: ${newBalance.toFixed(2)}₼`
+    );
+    setTimeout(() => router.push("/Pages/delivery"), 4000);
   };
 
   const [cartItems, setCartItems] = useState([]);
@@ -67,19 +96,19 @@ const Basket = () => {
     setSelectedPrize(prize);
   };
   useEffect(() => {
-    const userData = JSON.parse(localStorage.getItem("user")) || { basket: [] };
+    const userData = readStorage("user") || { basket: [] };
     setCartItems(userData.basket || []);
   }, []);
 
   const updateUserStorage = (updatedBasket) => {
-    const userData = JSON.parse(localStorage.getItem("user")) || {};
+    const userData = readStorage("user") || {};
     const updatedUserData = {
       ...userData,
       basket: updatedBasket,
     };
     localStorage.setItem("user", JSON.stringify(updatedUserData));
 
-    const parsedUser = JSON.parse(localStorage.getItem("user")) || {};
+    const parsedUser = readStorage("user") || {};
 
     axios
       .put(
@@ -93,79 +122,22 @@ const Basket = () => {
         console.error("Error updating user data on the server:", error);
       });
   };
-  const handleOrderClick = async () => {
-    const userData = JSON.parse(localStorage.getItem("user")) || { money: 0 };
+  // "Order" düyməsi: balansı yoxla, sonra çarxı fırlat
+  const handleOrderClick = () => {
+    if (cartItems.length === 0) {
+      toast.error("Your basket is empty.");
+      return;
+    }
+    const userData = readStorage("user") || { money: 0 };
     const userBalance = parseFloat(userData.money) || 0;
-    const discountedTotal = formattedTotalPrice - 
-    formattedTotalPrice * getNumericPrize(selectedPrize) * 0.01;
-
-    const newPrizeNumber = Math.floor(Math.random() * data.length);
-    let percent = newPrizeNumber;
-    setPrizeNumber(newPrizeNumber);
-    
-    if (userBalance >= formattedTotalPrice) {
-      setMustSpin(true);
-      setTimeout(() => {
-        setCartItems((prevCart) =>
-          prevCart.map((item) => ({ ...item, isFadingOut: true }))
-        );
-
-        setTimeout(() => {
-          console.log("log", newPrizeNumber);
-          console.log(
-            "consol",
-            (
-              userBalance -
-              (discountedTotal - newPrizeNumber * percent * 0.01)
-            ).toFixed(2)
-          );
-          const updatedBalance = (
-            userBalance -
-            (discountedTotal - newPrizeNumber * discountedTotal * 0.01)
-          ).toFixed(2);
-          localStorage.setItem(
-            "user",
-            JSON.stringify({
-              ...userData,
-              money: updatedBalance,
-              orders: [{
-                items: cartItems,
-                spent: discountedTotal.toFixed(2),
-                date: new Date().toISOString(), 
-              },],
-            })
-          );
-          const parsedUser = JSON.parse(localStorage.getItem("user"));
-          axios
-            .put(
-              `https://66eba35c2b6cf2b89c5b2596.mockapi.io/login/${parsedUser.id}`,
-              {
-                money: updatedBalance,
-                orders: [{
-                  items: cartItems,
-                  spent: discountedTotal.toFixed(2),
-                  date: new Date().toISOString(), 
-                },],
-              }
-            )
-            .then((response) => {
-              console.log("User data updated in API:", response.data);
-            })
-            .catch((error) => {
-              console.error("Error updating user data:", error);
-            });
-
-          setCartItems([]);
-          updateUserStorage([]);
-          setSelectedPrize("");
-          toast.success("Order successfully placed!");
-          router.push("./../../Pages/delivery"); 
-        }, 10000);
-      }, 12000);
-    } else {
+    if (userBalance < totalPrice) {
       toast.error("Insufficient balance! Please top up your account.");
       return;
     }
+    orderSnapshot.current = { items: cartItems, total: totalPrice };
+    setSelectedPrize("");
+    setPrizeNumber(Math.floor(Math.random() * data.length));
+    setMustSpin(true);
   };
 
   const removeItem = (id) => {
@@ -205,13 +177,12 @@ const Basket = () => {
     updateUserStorage(updatedItems);
   };
 
-  const totalPrice = cartItems.reduce((total, item) => {
-    const itemTotal = parseFloat(item.total) || 0;
-    return total + itemTotal;
-  }, 0);
+  const totalPrice = Math.round(
+    cartItems.reduce((total, item) => total + (parseFloat(item.total) || 0), 0) * 100
+  ) / 100;
   const formattedTotalPrice = totalPrice.toFixed(2);
   useEffect(() => {
-    const hasSpunBefore = JSON.parse(localStorage.getItem("hasSpun")) || false;
+    const hasSpunBefore = readStorage("hasSpun") || false;
     setHasSpun(hasSpunBefore);
   }, []);
 
@@ -225,7 +196,8 @@ const Basket = () => {
               cartItems.map((item) => (
                 <div key={item.id} className="cart-item">
                   <img
-                    src={item.image}
+                    src={productImage(item)}
+                    onError={onImageError(item.type)}
                     alt={item.name}
                     className="cart-item-image"
                   />
@@ -256,7 +228,7 @@ const Basket = () => {
               <>
                 {" "}
                 <p>There is no items in your basket.</p>
-                <Link href="./menu">
+                <Link href="/Pages/menu">
                   <button className="bg-red-600 hover:bg-red-800 text-white px-4 py-2 rounded-md transition duration-300">
                     Go Menu
                   </button>
@@ -302,44 +274,21 @@ const Basket = () => {
             <div className="cart-summary w-[100%]">
               <h3>Order Summary</h3>
               <div className="summary-details">
-                <p>Sale: {selectedPrize || "Please spin"}</p>
+                <p>Sale: {selectedPrize || "Spin the wheel after ordering"}</p>
                 <strong>Total</strong>
-                {selectedPrize ? null : 
-                  <del>
-                  {formattedTotalPrice}₼
-                </del>
-                }
-                <span>
-                  {selectedPrize
-                    ? `${(
-                        formattedTotalPrice -
-                        formattedTotalPrice *
-                          getNumericPrize(selectedPrize) *
-                          0.01
-                      ).toFixed(2)}₼`
-                    : null}
-                </span>
-                <span>
-                  {selectedPrize
-                    ? `${(
-                        formattedTotalPrice -
-                        formattedTotalPrice *
-                          getNumericPrize(selectedPrize) *
-                          0.01
-                      ).toFixed(2)}₼`
-                    : null}
-                </span>
-                {selectedPrize && (
-                  <p>
-                    Discounted amount: {discountedTotal}₼
-                    <br />
-                    Your balance:{" "}
-                    {(
-                      JSON.parse(localStorage.getItem("user")).money -
-                      discountedTotal
-                    ).toFixed(2)}
-                    ₼
-                  </p>
+                {isOrderPlaced && orderSnapshot.current ? (
+                  <>
+                    <del>{orderSnapshot.current.total.toFixed(2)}₼</del>
+                    <span>{discountedTotal.toFixed(2)}₼</span>
+                    <p>
+                      You saved:{" "}
+                      {(orderSnapshot.current.total - discountedTotal).toFixed(2)}₼
+                      <br />
+                      Your balance: {balanceAfter !== null ? balanceAfter.toFixed(2) : "-"}₼
+                    </p>
+                  </>
+                ) : (
+                  <span>{formattedTotalPrice}₼</span>
                 )}
               </div>
               <button

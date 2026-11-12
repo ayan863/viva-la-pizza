@@ -1,4 +1,6 @@
 "use client";
+import { productImage, onImageError } from "@/lib/images";
+import { readStorage } from "@/lib/storage";
 import { Modal, ModalClose, ModalDialog, Typography } from "@mui/joy";
 import React, { useEffect, useState, useCallback } from "react";
 import "./modal.css";
@@ -19,15 +21,18 @@ const Modals = ({
   open,
   onClose,
   type,
-  price,
+  price: rawPrice,
   ingredients,
   name,
   image,
   id,
 }) => {
+  // Qiymət rəqəm və ya massiv ola bilər; massivə çeviririk, çatmayan ölçüləri doldururuq
+  const baseList = (Array.isArray(rawPrice) ? rawPrice : [rawPrice]).map((p) => Number(p) || 0);
+  const price = [baseList[0], baseList[1] ?? baseList[0], baseList[2] ?? baseList[1] ?? baseList[0]];
   const storedUser = localStorage.getItem("user");
   const parsedUser = storedUser ? JSON.parse(storedUser) : null;
-  const isItemInBasket = parsedUser?.basket.some((item) => item.id === id);
+  const isItemInBasket = (parsedUser?.basket || []).some((item) => item.id === id);
   const [showCount, setShowCount] = useState(isItemInBasket || false);
   const [dynamicPrice, setDynamicPrice] = useState(price[0]);
   const [basketCount, setBasketCount] = useState(0);
@@ -37,7 +42,7 @@ const Modals = ({
       const storedUser = localStorage.getItem("user");
       if (storedUser) {
         const parsedUser = JSON.parse(storedUser);
-        const item = parsedUser.basket.find((item) => item.id === id);
+        const item = (parsedUser.basket || []).find((item) => item.id === id);
         return item ? item.quantity : 1; 
       }
     } catch (error) {
@@ -50,7 +55,7 @@ const Modals = ({
       const storedUser = localStorage.getItem("user");
       if (storedUser) {
         const parsedUser = JSON.parse(storedUser);
-        const item = parsedUser.basket.find((item) => item.id === id);
+        const item = (parsedUser.basket || []).find((item) => item.id === id);
         return item ? item.size : "regular"; 
       }
     } catch (error) {
@@ -65,7 +70,7 @@ const Modals = ({
       const storedUser = localStorage.getItem("user");
       if (storedUser) {
         const parsedUser = JSON.parse(storedUser);
-        const item = parsedUser.basket.find((item) => item.id === id);
+        const item = (parsedUser.basket || []).find((item) => item.id === id);
         return item ? item.size : "small"; 
       }
     } catch (error) {
@@ -99,7 +104,7 @@ const Modals = ({
       const storedUser = localStorage.getItem("user");
       if (storedUser) {
         const parsedUser = JSON.parse(storedUser);
-        const itemIndex = parsedUser.basket.findIndex((item) => item.id === id);
+        const itemIndex = (parsedUser.basket || []).findIndex((item) => item.id === id);
 
         if (itemIndex !== -1) {
           parsedUser.basket[itemIndex].size = newValue;
@@ -122,7 +127,7 @@ const Modals = ({
       if (!storedUser) return;
 
       const parsedUser = JSON.parse(storedUser);
-      const updatedBasket = parsedUser.basket.filter((item) => item.id !== id);
+      const updatedBasket = (parsedUser.basket || []).filter((item) => item.id !== id);
 
       parsedUser.basket = updatedBasket;
       localStorage.setItem("user", JSON.stringify(parsedUser));
@@ -153,7 +158,7 @@ const Modals = ({
       const storedUser = localStorage.getItem("user");
       if (storedUser) {
         const parsedUser = JSON.parse(storedUser);
-        const itemIndex = parsedUser.basket.findIndex((item) => item.id === id);
+        const itemIndex = (parsedUser.basket || []).findIndex((item) => item.id === id);
 
         if (itemIndex !== -1) {
           parsedUser.basket[itemIndex].quantity = newQuantity;
@@ -178,7 +183,7 @@ const Modals = ({
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
           const parsedUser = JSON.parse(storedUser);
-          const itemIndex = parsedUser.basket.findIndex(
+          const itemIndex = (parsedUser.basket || []).findIndex(
             (item) => item.id === id
           );
 
@@ -212,10 +217,14 @@ const Modals = ({
   };
 
   const handleAddToCartClick = () => {
-    const storedUser = localStorage.getItem("user");
-    let parsedUser = storedUser ? JSON.parse(storedUser) : { basket: [] };
+    const parsedUser = readStorage("user");
+    if (!parsedUser || !parsedUser.id) {
+      toast.error("Please log in to add items to the basket.");
+      return;
+    }
+    parsedUser.basket = parsedUser.basket || [];
 
-    const itemIndex = parsedUser.basket.findIndex((item) => item.id === id);
+    const itemIndex = (parsedUser.basket || []).findIndex((item) => item.id === id);
     if (itemIndex === -1) {
       parsedUser.basket.push({
         id,
@@ -260,7 +269,7 @@ const Modals = ({
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       const parsedUser = JSON.parse(storedUser);
-      const itemIndex = parsedUser.basket.findIndex((item) => item.id === id);
+      const itemIndex = (parsedUser.basket || []).findIndex((item) => item.id === id);
 
       if (itemIndex !== -1) {
         setValue(itemIndex.size); 
@@ -303,7 +312,8 @@ const Modals = ({
         <div className="relative flex items-center justify-start gap-4">
           <div className="absolute right-0 top-[58%] transform -translate-y-1/2 w-1/2 h-full overflow-hidden">
             <img
-              src={image}
+              src={productImage({ image, name, type, id })}
+            onError={onImageError(type)}
               alt={name}
               className="max-w-[100%] min-h-[85%] object-fill hidden sm:block"
               style={{ clipPath: "inset(0 0 0 45%)" }}
@@ -377,7 +387,7 @@ const Modals = ({
                     onClick={() => handleSizeChange("small", price[0])}
                   >
                     <img
-                      src="https://dominospizza.az/static/media/small.3c7b3f6b.webp"
+                      src="/images/options/size-small.svg"
                       alt="small-size"
                       className="w-[37px] h-[37px]"
                     />
@@ -395,7 +405,7 @@ const Modals = ({
                     onClick={() => handleSizeChange("medium", price[1])}
                   >
                     <img
-                      src="https://dominospizza.az/static/media/medium.1852d9f7.webp"
+                      src="/images/options/size-medium.svg"
                       alt="medium-size"
                       className="w-[37px] h-[37px] object-"
                     />
@@ -412,7 +422,7 @@ const Modals = ({
                     onClick={() => handleSizeChange("large", price[2])}
                   >
                     <img
-                      src="https://dominospizza.az/static/media/large.bc36cb66.webp"
+                      src="/images/options/size-large.svg"
                       alt="large-size"
                       className="w-[37px] h-[37px]"
                     />
@@ -440,7 +450,7 @@ const Modals = ({
                     selected={valueSlice === "regular"}
                   >
                     <img
-                      src="https://dominospizza.az/static/media/large-regular-cut.f635649f.webp"
+                      src="/images/options/cut-regular.svg"
                       alt="regular-cut"
                       className="w-[37px] h-[37px]"
                     />
@@ -455,7 +465,7 @@ const Modals = ({
                     selected={valueSlice === "double"}
                   >
                     <img
-                      src="https://dominospizza.az/static/media/large-double-cut.499307d9.webp"
+                      src="/images/options/cut-double.svg"
                       alt="double-cut"
                       className="w-[37px] h-[37px] object-"
                     />
@@ -470,7 +480,7 @@ const Modals = ({
                     selected={valueSlice === "square"}
                   >
                     <img
-                      src="https://dominospizza.az/static/media/large-square-cut.9dfa97a8.webp"
+                      src="/images/options/cut-square.svg"
                       alt="square-cut"
                       className="w-[37px] h-[37px]"
                     />
@@ -528,7 +538,7 @@ const Modals = ({
                       width: "130px", 
                       height: "65px", 
                       backgroundImage:
-                        'url("https://s3.eu-west-3.amazonaws.com/ppost/Mozzarella-Edge.png")',
+                        'url("/images/options/edge-mozzarella.svg")',
                       backgroundSize: "cover", 
                       backgroundPosition: "center",
                       justifyContent: "flex-end",
@@ -571,7 +581,7 @@ const Modals = ({
                       width: "130px", 
                       height: "65px", 
                       backgroundImage:
-                        'url("https://s3.eu-west-3.amazonaws.com/ppost/Sausage-Edge.png")',
+                        'url("/images/options/edge-sausage.svg")',
                       backgroundSize: "cover",
                       backgroundPosition: "center",
                       justifyContent: "flex-end",
@@ -614,7 +624,7 @@ const Modals = ({
                       width: "130px", 
                       height: "65px",
                       backgroundImage:
-                        'url("https://s3.eu-west-3.amazonaws.com/ppost/Parmesan-Edge.png")',
+                        'url("/images/options/edge-parmesan.svg")',
                       backgroundSize: "cover",
                       backgroundPosition: "center",
                       justifyContent: "flex-end",

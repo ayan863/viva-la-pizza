@@ -1,11 +1,12 @@
 "use client";
+import { readStorage } from "@/lib/storage";
 import React from "react";
 import Header from "../../Components/Header/Header";
 import Footer from "../../Components/Footer/Footer";
 import { Rating } from "@mui/material";
 
 const page = () => {
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user = readStorage("user");
 
   return (
     <>

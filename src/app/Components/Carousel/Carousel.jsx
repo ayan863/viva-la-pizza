@@ -39,12 +39,12 @@ const Carousel = () => {
             <h1 className="text-4xl font-bold font-beyond">Pizza & Pasta</h1>
             
             <button  className="px-8 py-4 bg-red-600 text-white font-medium rounded-2xl hover:bg-red-700 transition duration-300 flex items-center justify-center gap-2 shadow-lg">
-        <FaShoppingCart /> <Link href="../../Pages/menu">Today's Menu</Link>
+        <FaShoppingCart /> <Link href="/Pages/menu">Today's Menu</Link>
       </button>
           </div>
         </SwiperSlide>
         <SwiperSlide>
-        <div className="all bg-[url('https://opencart.templatetrip.com/OPCTM01/OPCTM013_pizza/image/catalog/demo/banners/parallax-bg.jpg')] h-[650px] bg-cover bg-center">
+        <div className="all bg-[url('/images/scenes/hero-rewards.svg')] h-[650px] bg-cover bg-center">
   <div className="flex justify-end w-[85%] items-center h-full px-8 text-right">
     <div className="max-w-lg text-white p-8 backdrop-blur-lg bg-black/50 rounded-3xl shadow-lg w-[400px]">
       <h4 className="text-xl font-semibold text-red-500 mb-3 uppercase tracking-wide text-start">

@@ -1,4 +1,5 @@
 "use client";
+import { readStorage } from "@/lib/storage";
 import WarningIcon from '@mui/icons-material/Warning';
 import CloseIcon from '@mui/icons-material/Close';
 import { FaFacebookF, FaTwitter, FaGoogle } from 'react-icons/fa';
@@ -29,16 +30,14 @@ const Login = () => {
           const matchedUser = data.find(
             (item) => item.name === values.name && item.password === values.password
           );
-          localStorage.clear();
-          localStorage.setItem(`user`,JSON.stringify(matchedUser));
-          console.log("item=",matchedUser);
-  
           if (matchedUser) {
+            localStorage.clear();
+            localStorage.setItem(`user`, JSON.stringify(matchedUser));
             setLoginSuccess(true);
             actions.resetForm();
   
             router.push(`/`)
-            toast.success(`Welcome to Viva La Pizza, ${JSON.parse(localStorage.getItem("user")).name}`)
+            toast.success(`Welcome to Viva La Pizza, ${readStorage("user").name}`)
           } else {
             setLoginSuccess(false);
           }
@@ -195,7 +194,7 @@ const Login = () => {
               </div>
             </div>
             <div className="sign">
-              <Link href="./../../Pages/signup">Or Sign Up</Link>
+              <Link href="/Pages/signup">Or Sign Up</Link>
             </div>
           </div>
         </div>

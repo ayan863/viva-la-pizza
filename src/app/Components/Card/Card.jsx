@@ -1,4 +1,6 @@
 "use client";
+import { productImage, onImageError } from "@/lib/images";
+import { readStorage } from "@/lib/storage";
 
 import "./card.css";
 import React, { useState, useEffect, useCallback } from "react";
@@ -22,7 +24,7 @@ const CardComp = ({ type, price, ingredients, name, image, id }) => {
   const parsedUser = storedUser ? JSON.parse(storedUser) : null;
   const [isModalOpen, setModalOpen] = useState(false);
 
-  const isItemInBasket = parsedUser?.basket.some((item) => item.id === id);
+  const isItemInBasket = (parsedUser?.basket || []).some((item) => item.id === id);
   const [showCount, setShowCount] = useState(isItemInBasket || false);
   // const [dynamicPrice, setDynamicPrice] = useState(price[0]);
   const [basketCount, setBasketCount] = useState(0);
@@ -36,7 +38,7 @@ const CardComp = ({ type, price, ingredients, name, image, id }) => {
       const storedUser = localStorage.getItem("user");
       if (storedUser) {
         const parsedUser = JSON.parse(storedUser);
-        const item = parsedUser.basket.find((item) => item.id === id);
+        const item = (parsedUser.basket || []).find((item) => item.id === id);
         return item ? item.quantity : 1; 
       }
     } catch (error) {
@@ -49,7 +51,7 @@ const CardComp = ({ type, price, ingredients, name, image, id }) => {
       const storedUser = localStorage.getItem("user");
       if (storedUser) {
         const parsedUser = JSON.parse(storedUser);
-        const item = parsedUser.basket.find((item) => item.id === id);
+        const item = (parsedUser.basket || []).find((item) => item.id === id);
         return item ? item.size : "regular"; 
       }
     } catch (error) {
@@ -64,7 +66,7 @@ const CardComp = ({ type, price, ingredients, name, image, id }) => {
       const storedUser = localStorage.getItem("user");
       if (storedUser) {
         const parsedUser = JSON.parse(storedUser);
-        const item = parsedUser.basket.find((item) => item.id === id);
+        const item = (parsedUser.basket || []).find((item) => item.id === id);
         return item ? item.size : "small"; 
       }
     } catch (error) {
@@ -76,7 +78,17 @@ const CardComp = ({ type, price, ingredients, name, image, id }) => {
   const [value, setValue] = useState(getInitialValue);
 
   const [quantity, setQuantity] = useState(getInitialQuantity);
-  const dynamicPrice = price[0]; 
+  // Qiymət bəzən rəqəm, bəzən [small, medium, large] massividir — həmişə massiv edirik
+  const prices = (Array.isArray(price) ? price : [price]).map((p) => Number(p) || 0);
+  const priceForSize = (size) => {
+    if (size === "medium") return prices[1] ?? prices[0];
+    if (size === "large") return prices[2] ?? prices[1] ?? prices[0];
+    return prices[0];
+  };
+  const [dynamicPrice, setDynamicPrice] = useState(() => {
+    const item = parsedUser?.basket?.find((i) => i.id === id);
+    return item && Number(item.price) ? Number(item.price) : prices[0];
+  });
   // if (isNaN(dynamicPrice)) {
   //   console.error("Invalid price:", dynamicPrice);
   // }
@@ -84,15 +96,12 @@ const CardComp = ({ type, price, ingredients, name, image, id }) => {
   const handleSizeChange = async (event, newValue) => {
     if (newValue !== null) {
       setValue(newValue);
-      let newPrice;
-      if (newValue === "small") newPrice = price[0];
-      else if (newValue === "medium") newPrice = price[1];
-      else if (newValue === "large") newPrice = price[2];
+      const newPrice = priceForSize(newValue);
       setDynamicPrice(newPrice);
       const storedUser = localStorage.getItem("user");
       if (storedUser) {
         const parsedUser = JSON.parse(storedUser);
-        const itemIndex = parsedUser.basket.findIndex((item) => item.id === id);
+        const itemIndex = (parsedUser.basket || []).findIndex((item) => item.id === id);
 
         if (itemIndex !== -1) {
           
@@ -115,7 +124,7 @@ const CardComp = ({ type, price, ingredients, name, image, id }) => {
       if (!storedUser) return;
 
       const parsedUser = JSON.parse(storedUser);
-      const updatedBasket = parsedUser.basket.filter((item) => item.id !== id);
+      const updatedBasket = (parsedUser.basket || []).filter((item) => item.id !== id);
 
       parsedUser.basket = updatedBasket;
       localStorage.setItem("user", JSON.stringify(parsedUser));
@@ -146,7 +155,7 @@ const CardComp = ({ type, price, ingredients, name, image, id }) => {
       const storedUser = localStorage.getItem("user");
       if (storedUser) {
         const parsedUser = JSON.parse(storedUser);
-        const itemIndex = parsedUser.basket.findIndex((item) => item.id === id);
+        const itemIndex = (parsedUser.basket || []).findIndex((item) => item.id === id);
 
         if (itemIndex !== -1) {
           parsedUser.basket[itemIndex].quantity = newQuantity;
@@ -171,7 +180,7 @@ const CardComp = ({ type, price, ingredients, name, image, id }) => {
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
           const parsedUser = JSON.parse(storedUser);
-          const itemIndex = parsedUser.basket.findIndex(
+          const itemIndex = (parsedUser.basket || []).findIndex(
             (item) => item.id === id
           );
 
@@ -245,10 +254,14 @@ const CardComp = ({ type, price, ingredients, name, image, id }) => {
   );
 
   const handleAddToCartClick = () => {
-    const storedUser = localStorage.getItem("user");
-    let parsedUser = storedUser ? JSON.parse(storedUser) : { basket: [] };
-  
-    const itemIndex = parsedUser.basket.findIndex((item) => item.id === id);
+    const parsedUser = readStorage("user");
+    if (!parsedUser || !parsedUser.id) {
+      toast.error("Please log in to add items to the basket.");
+      return;
+    }
+    parsedUser.basket = parsedUser.basket || [];
+
+    const itemIndex = (parsedUser.basket || []).findIndex((item) => item.id === id);
     const totalPrice = (quantity * dynamicPrice).toFixed(2);
   
     if (itemIndex === -1) {
@@ -298,7 +311,7 @@ const CardComp = ({ type, price, ingredients, name, image, id }) => {
   //   const storedUser = localStorage.getItem("user");
   //   let parsedUser = storedUser ? JSON.parse(storedUser) : { basket: [] };
 
-  //   const itemIndex = parsedUser.basket.findIndex((item) => item.id === id);
+  //   const itemIndex = (parsedUser.basket || []).findIndex((item) => item.id === id);
   //   if (itemIndex === -1) {
   //     parsedUser.basket.push({
   //       id,
@@ -343,7 +356,7 @@ const CardComp = ({ type, price, ingredients, name, image, id }) => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       const parsedUser = JSON.parse(storedUser);
-      const itemIndex = parsedUser.basket.findIndex((item) => item.id === id);
+      const itemIndex = (parsedUser.basket || []).findIndex((item) => item.id === id);
 
       if (itemIndex !== -1) {
         setValue(itemIndex.size); 
@@ -374,7 +387,8 @@ const CardComp = ({ type, price, ingredients, name, image, id }) => {
       >
         <CardOverflow className="w-[200px] sm:w-[300px]">
           <img
-            src={image}
+            src={productImage({ image, name, type, id })}
+            onError={onImageError(type)}
             loading="lazy"
             alt={name}
             className={

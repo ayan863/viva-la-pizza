@@ -23,34 +23,34 @@ const Footer = () => {
       <div className="images flex flex-col ">
         <div className="firstL flex gap-2">
           <img
-            src="https://opencart.templatetrip.com/OPCTM01/OPCTM013_pizza/image/cache/catalog/demo/banners/5-home-default-870x564.jpg"
+            src="/images/scenes/gallery-5.svg"
             alt=""
             className="w-[75px] h-[75px]" 
           />
           <img
-            src="https://opencart.templatetrip.com/OPCTM01/OPCTM013_pizza/image/cache/catalog/demo/banners/4-home-default-870x564.jpg"
+            src="/images/scenes/gallery-4.svg"
             alt=""
             className="w-[75px] h-[75px]"
           />
           <img
-            src="https://opencart.templatetrip.com/OPCTM01/OPCTM013_pizza/image/cache/catalog/demo/banners/3-home-default-870x564.jpg"
+            src="/images/scenes/gallery-3.svg"
             alt=""
             className="w-[75px] h-[75px]"
           />
         </div>
         <div className="secondL flex gap-2">
           <img
-            src="https://opencart.templatetrip.com/OPCTM01/OPCTM013_pizza/image/cache/catalog/demo/banners/2-home-default-870x564.jpg"
+            src="/images/scenes/gallery-2.svg"
             alt=""
             className="w-[75px] h-[75px]"
           />
           <img
-            src="https://opencart.templatetrip.com/OPCTM01/OPCTM013_pizza/image/cache/catalog/demo/banners/1-home-default-870x564.jpg"
+            src="/images/scenes/gallery-1.svg"
             alt=""
             className="w-[75px] h-[75px]"
           />
           <img
-            src="https://opencart.templatetrip.com/OPCTM01/OPCTM013_pizza/image/cache/catalog/demo/banners/gallery-img-05.jpg"
+            src="/images/scenes/gallery-6.svg"
             alt=""
             className="w-[75px] h-[75px]"
           />
@@ -79,7 +79,7 @@ const Footer = () => {
     </div>
   </div>
   <div className="copyR p-5 flex items-center justify-center text-white">
-    Powered By <a href="https://www.opencart.com/">OpenCart</a> Your Store © 2024
+    © 2024 Viva La Pizza. Built by Ayan Ismayilzade
   </div>
   </div>
 </footer>

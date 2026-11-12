@@ -2,7 +2,7 @@
 
 header{
 
-    background-image: url('https://opencart.templatetrip.com/OPCTM01/OPCTM013_pizza/catalog/view/theme/OPCTM013/stylesheet/TemplateTrip/images/footer-bg.jpg');
+    background-image: url('/images/scenes/dark-bg.svg');
     background-size: cover;
     background-repeat: no-repeat;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3); 

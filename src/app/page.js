@@ -35,12 +35,12 @@ export default function Home() {
 
             <div className="flex gap-5 justify-center items-center">
               <img
-                src="https://opencart.templatetrip.com/OPCTM01/OPCTM013_pizza/image/catalog/demo/banners/cms-img-02.jpg"
+                src="/images/scenes/history-1.svg"
                 alt="pizza"
                 className="w-28 h-28 md:w-40 md:h-40 lg:w-52 lg:h-52 object-cover pb-3 md:pb-6"
               />
               <img
-                src="https://opencart.templatetrip.com/OPCTM01/OPCTM013_pizza/image/catalog/demo/banners/cms-img-01.jpg"
+                src="/images/scenes/history-2.svg"
                 alt="pizza"
                 className="w-28 h-28 md:w-40 md:h-40 lg:w-52 lg:h-52 object-cover pt-3 md:pt-6"
               />
@@ -52,11 +52,11 @@ export default function Home() {
         <OurMenuTab />
         <CarouselMini
 
-          images={["https://opencart.templatetrip.com/OPCTM01/OPCTM013_pizza/image/cache/catalog/demo/banners/3-home-default-870x564.jpg",
-            "https://opencart.templatetrip.com/OPCTM01/OPCTM013_pizza/image/cache/catalog/demo/banners/4-home-default-870x564.jpg",
-            "https://opencart.templatetrip.com/OPCTM01/OPCTM013_pizza/image/cache/catalog/demo/banners/5-home-default-870x564.jpg",
-            "https://opencart.templatetrip.com/OPCTM01/OPCTM013_pizza/image/cache/catalog/demo/banners/1-home-default-870x564.jpg",
-            "https://opencart.templatetrip.com/OPCTM01/OPCTM013_pizza/image/cache/catalog/demo/banners/2-home-default-870x564.jpg"]} />
+          images={["/images/scenes/gallery-3.svg",
+            "/images/scenes/gallery-4.svg",
+            "/images/scenes/gallery-5.svg",
+            "/images/scenes/gallery-1.svg",
+            "/images/scenes/gallery-2.svg"]} />
       </section>
       <Footer />
     </>

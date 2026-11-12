@@ -5,7 +5,7 @@
     padding: 0;
 }
 footer{
-    background-image: url('https://opencart.templatetrip.com/OPCTM01/OPCTM013_pizza/catalog/view/theme/OPCTM013/stylesheet/TemplateTrip/images/footer-bg.jpg');
+    background-image: url('/images/scenes/dark-bg.svg');
     background-size: cover;
     background-repeat: no-repeat;
     font-family: "Mulish", Helvetica, sans-serif;

@@ -1,4 +1,6 @@
 "use client";
+import { productImage, onImageError } from "@/lib/images";
+import { readStorage } from "@/lib/storage";
 import { FaPen } from "react-icons/fa";
 import * as React from "react";
 import Box from "@mui/joy/Box";
@@ -33,7 +35,7 @@ import {
   addProduct,
 } from "../../redux/feature/product/ProductSlice.js";
 export const setItemToLocalStorage = (key, data) => {
-  let existingData = JSON.parse(localStorage.getItem(key)) || [];
+  let existingData = readStorage(key) || [];
 
   existingData = existingData.map((item) =>
     item.id === data.id ? { ...item, ...data } : item
@@ -173,7 +175,7 @@ const OurMenuTab = () => {
   
       dispatch(editProduct(updatedProduct))
         .then(() => {
-          const currentProducts = JSON.parse(localStorage.getItem("products")) || [];
+          const currentProducts = readStorage("products") || [];
           console.log("Current Products:", currentProducts);
   
           const updatedProducts = currentProducts.map((product) =>
@@ -241,7 +243,8 @@ const OurMenuTab = () => {
               key={item.id}
             >
               <img
-                src={item.image}
+                src={productImage(item)}
+                onError={onImageError(item.type)}
                 alt={item.name}
                 className="w-[90px] h-[90px] m-2"
               />
@@ -566,7 +569,7 @@ const OurMenuTab = () => {
                         <FormLabel>Image</FormLabel>
                         <Input
                           name="image"
-                          placeholder="https://vivalapizza.az/upload/resize_cache/iblock/9c5/254_254_2/9c569f8bc8a550ac6d2df4ba7f00b077.png?1714726493144977"
+                          placeholder="/images/products/pizza.svg"
                           autoFocus
                           required
                         />
