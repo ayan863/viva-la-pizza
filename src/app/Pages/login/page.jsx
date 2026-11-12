@@ -195,7 +195,7 @@ const Login = () => {
               </div>
             </div>
             <div className="sign">
-              <Link href="/Pages/signup">Or Sign Up</Link>
+              <Link href="./../../Pages/signup">Or Sign Up</Link>
             </div>
           </div>
         </div>

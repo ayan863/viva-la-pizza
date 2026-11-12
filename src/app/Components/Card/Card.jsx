@@ -76,7 +76,7 @@ const CardComp = ({ type, price, ingredients, name, image, id }) => {
   const [value, setValue] = useState(getInitialValue);
 
   const [quantity, setQuantity] = useState(getInitialQuantity);
-  const [dynamicPrice, setDynamicPrice] = useState(price[0]);
+  const dynamicPrice = price[0]; 
   // if (isNaN(dynamicPrice)) {
   //   console.error("Invalid price:", dynamicPrice);
   // }

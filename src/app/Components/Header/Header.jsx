@@ -155,11 +155,11 @@ const Header = () => {
                 {item.title === "Home" ? (
                   <Link href="/">{item.title}</Link>
                 ) : item.title === "Services" ? (
-                  <Link href="/Pages/menu">{item.title}</Link>
+                  <Link href="../../Pages/menu">{item.title}</Link>
                 ) : item.title === "About Us" ? (
-                  <Link href="/Pages/aboutUs">{item.title}</Link>
+                  <Link href="../../Pages/aboutUs">{item.title}</Link>
                 ): item.title === "Order history" ? (
-                  <Link href="/Pages/orderHistory">{item.title}</Link>
+                  <Link href="../../Pages/orderHistory">{item.title}</Link>
                 )
                 
                 : (
@@ -203,10 +203,10 @@ const Header = () => {
               <div className="userMenu absolute top-full mt-2 z-10 bg-white text-black rounded shadow-lg p-2">
                 <ul>
                   <li className="px-4 py-2 hover:bg-gray-200 text-[15px] rounded">
-                    <Link href="/">Profile</Link>
+                    <Link href="./">Profile</Link>
                   </li>
                   <li className="px-4 py-2 hover:bg-gray-200 text-[15px] rounded">
-                    <Link href="/Pages/wishlist">Wishlist</Link>
+                    <Link href="./../../Pages/wishlist">Wishlist</Link>
                   </li>
 
                   {userData ? (
@@ -224,7 +224,7 @@ const Header = () => {
                       <li className="text-[15px]">
                         <Link
                           className="hover:bg-gray-200 flex px-4 py-2 rounded"
-                          href="/Pages/login"
+                          href="../../Pages/login"
                         >
                           Login
                         </Link>
@@ -232,7 +232,7 @@ const Header = () => {
                       <li className="text-[15px] ">
                         <Link
                           className="hover:bg-gray-200 flex px-4 py-2 rounded"
-                          href="/Pages/signup"
+                          href="../../Pages/signup"
                         >
                           Signup
                         </Link>
@@ -250,7 +250,7 @@ const Header = () => {
               onMouseEnter={handleBasketMouseEnter}
               onMouseLeave={handleBasketMouseLeave}
             >
-              <Link href="/Pages/basket">
+              <Link href="./../../Pages/basket">
                 <Badge
                   badgeContent={basketCount}
                   variant="solid"
@@ -299,7 +299,7 @@ const Header = () => {
                       </ul>
                       <div className="mt-4 text-center">
                         <Link
-                          href="/Pages/basket"
+                          href="./../../Pages/basket"
                           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
                         >
                           Go Basket Page
